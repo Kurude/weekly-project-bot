@@ -53,6 +53,8 @@ Requirements:
 - Include a README.md explaining the problem, solution, aur setup/run instructions
 - Include at least one basic test file
 - Use the suggested tech_stack
+- Keep the entire JSON response under 6,000 characters: use at most 5 small files and no large assets.
+- Prefer browser-native APIs or Node built-ins over dependencies, and implement only the essential MVP flow.
 
 STRICT JSON format mein jawab do (kuch aur text nahi, koi markdown fences nahi), is shape mein:
 {
@@ -66,18 +68,26 @@ STRICT JSON format mein jawab do (kuch aur text nahi, koi markdown fences nahi),
 
 Content strings mein actual file content ho, properly escaped.`;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: prompt,
-    config: {
-      maxOutputTokens: 12000,
-      responseMimeType: "application/json",
-    },
-  });
+  let lastError;
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: `${prompt}\nThis is attempt ${attempt}; return a complete, valid JSON object only.`,
+      config: {
+        maxOutputTokens: 12000,
+        responseMimeType: "application/json",
+      },
+    });
 
-  const text = response.text;
-  const clean = text.replace(/```json|```/g, "").trim();
-  return JSON.parse(clean);
+    try {
+      const clean = response.text.replace(/```json|```/g, "").trim();
+      return JSON.parse(clean);
+    } catch (error) {
+      lastError = error;
+      console.warn(`Gemini returned invalid project JSON (attempt ${attempt}/2); retrying...`);
+    }
+  }
+  throw lastError;
 }
 
 // ---- 3. Write files to disk ----
