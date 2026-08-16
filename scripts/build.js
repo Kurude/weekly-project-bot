@@ -69,7 +69,10 @@ Content strings mein actual file content ho, properly escaped.`;
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash",
     contents: prompt,
-    config: { maxOutputTokens: 8000 },
+    config: {
+      maxOutputTokens: 12000,
+      responseMimeType: "application/json",
+    },
   });
 
   const text = response.text;
