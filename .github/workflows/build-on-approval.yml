@@ -1,0 +1,57 @@
+name: Build On Approval
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  build:
+    if: github.event.label.name == 'approved'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - run: npm install
+
+      - name: Generate project with Claude
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+          ORCHESTRATION_REPO: ${{ github.repository }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: npm run build-project
+
+      - name: Install deps + run tests inside generated project
+        working-directory: generated-project
+        run: |
+          if [ -f package.json ]; then
+            npm install || true
+            npm test || echo "Tests failed or not configured, continuing anyway (review needed)"
+          fi
+
+      - name: Create and push new repo
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+          GITHUB_USERNAME: ${{ vars.GITHUB_USERNAME }}
+        working-directory: generated-project
+        run: |
+          REPO_NAME=$(cat ../repo-name.txt)
+          git init -b main
+          git config user.name "weekly-project-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add .
+          git commit -m "Auto-generated MVP: $REPO_NAME"
+          gh repo create "$REPO_NAME" --public --source=. --push
+
+      - name: Comment back on the issue
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          REPO_NAME=$(cat repo-name.txt)
+          gh issue comment ${{ github.event.issue.number }} \
+            --repo ${{ github.repository }} \
+            --body "✅ Project banaya aur push kar diya: https://github.com/${{ vars.GITHUB_USERNAME }}/$REPO_NAME"

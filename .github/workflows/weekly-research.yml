@@ -1,0 +1,26 @@
+name: Weekly Research
+
+on:
+  schedule:
+    # Har Monday 9:00 AM UTC (IST subah 2:30 ke around — chaaho toh time change kar lo)
+    - cron: "0 9 * * 1"
+  workflow_dispatch: {} # manual trigger ke liye bhi (test karne ke liye useful)
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - run: npm install
+
+      - name: Run research script
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+          ORCHESTRATION_REPO: ${{ github.repository }}
+        run: npm run research

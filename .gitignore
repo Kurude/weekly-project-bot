@@ -1,0 +1,4 @@
+.env
+node_modules/
+generated-project/
+repo-name.txt
