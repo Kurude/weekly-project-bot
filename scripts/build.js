@@ -53,8 +53,9 @@ Requirements:
 - Include a README.md explaining the problem, solution, aur setup/run instructions
 - Include at least one basic test file
 - Use the suggested tech_stack
-- Keep the entire JSON response under 6,000 characters: use at most 5 small files and no large assets.
-- Prefer browser-native APIs or Node built-ins over dependencies, and implement only the essential MVP flow.
+- Return exactly these four files only: README.md, package.json, src/index.js, and tests/basic.test.js.
+- Keep the entire JSON response under 1,800 characters. README.md must be under 250 characters, src/index.js under 600 characters, tests/basic.test.js under 350 characters, and package.json under 180 characters.
+- Use a dependency-free Node.js CLI implementation with Node's built-in test runner, regardless of the suggested stack. Implement only one essential MVP flow; no CSS, HTML, assets, or lockfiles.
 
 STRICT JSON format mein jawab do (kuch aur text nahi, koi markdown fences nahi), is shape mein:
 {
