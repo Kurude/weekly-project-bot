@@ -36,7 +36,7 @@ jobs:
       - name: Create and push new repo
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
-          GITHUB_USERNAME: ${{ vars.GITHUB_USERNAME }}
+          GITHUB_USERNAME: ${{ vars.PROJECT_OWNER }}
         working-directory: generated-project
         run: |
           REPO_NAME=$(cat ../repo-name.txt)
@@ -54,4 +54,4 @@ jobs:
           REPO_NAME=$(cat repo-name.txt)
           gh issue comment ${{ github.event.issue.number }} \
             --repo ${{ github.repository }} \
-            --body "✅ Project banaya aur push kar diya: https://github.com/${{ vars.GITHUB_USERNAME }}/$REPO_NAME"
+            --body "✅ Project banaya aur push kar diya: https://github.com/${{ vars.PROJECT_OWNER }}/$REPO_NAME"

@@ -30,7 +30,7 @@ Isi repo mein Issues create honge har hafte (proposal ke liye).
 - `GH_PAT` — Step 3 wala token
 
 `Settings > Secrets and variables > Actions > Variables` tab mein:
-- `GITHUB_USERNAME` — tumhara GitHub username
+- `PROJECT_OWNER` — tumhara GitHub username
 
 ### 5. Workflow permissions on karo
 Repo > Settings > Actions > General > Workflow permissions:
